@@ -29,6 +29,9 @@ venv/
 # Rust
 target/
 
+# AI course material (large files)
+**/course_material/
+
 # Secrets / env
 .env
 .env.*
