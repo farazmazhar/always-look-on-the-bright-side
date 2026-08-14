@@ -16,6 +16,10 @@ Personal learning repo organized by language/platform. No shared build system �
   - `enhancing-maingate-ipcam-with-opencv/` — Jupyter notebook for OpenCV + face_recognition on IP camera
   - `prettymaps-demo/` — Jupyter notebook for prettymaps experimentation
 
+- **`ai/`** — AI/ML courses from Udemy & other platforms
+  - `AI A-Z [2026] - [Udemy]/` — AI course
+  - `LangChain- Agentic AI Engineering - [Udemy]/` — LangChain agentic AI course
+
 ## Conventions
 
 - No centralized package manager or build orchestration
@@ -23,3 +27,11 @@ Personal learning repo organized by language/platform. No shared build system �
 - Go projects use `go.mod` / `go.sum`
 - Python projects are standalone Jupyter notebooks or scripts
 - Coursework folders follow `N_TopicName` naming for linear progression
+
+## Course Note-Taking Conventions (`ai/` courses)
+
+- Each course has a top-level `COURSEDETAILS.md` with metadata and syllabus
+- Section folders: `sNN-topic-name` (e.g., `s02-gist-of-langchain`), zero-padded two-digit NN
+- Lecture notes: `lecture-NN-lecture-name.md` (e.g., `lecture-06-what-is-langchain.md`)
+- When user says "section N, lecture M" — create folder if new, then create lecture file
+- When user says only "lecture M" — use the last section that was created
