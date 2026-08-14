@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel", "cython"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastmath"
+version = "1.0.0"
+description = "Cython demo — compile a .pyx to a native extension with .pyi stubs."
+requires-python = ">=3.10"
+license = "MIT"
+
+[tool.setuptools]
+# Disable auto-discovery: demo.py/consumer.py are NOT part of the package.
+py-modules = []
+packages = []
+
+[[tool.setuptools.ext-modules]]
+name = "fastmath"
+sources = ["fastmath.pyx"]
+# Ship the stub beside the compiled module so type checkers can find it.
+[tool.setuptools.data-files]
+"" = ["fastmath.pyi"]

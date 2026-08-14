@@ -35,3 +35,7 @@ target/
 # Secrets / env
 .env
 .env.*
+
+.mypy_cache
+build
+dist
