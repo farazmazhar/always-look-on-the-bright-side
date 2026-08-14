@@ -39,6 +39,8 @@ Each library gets its own **numbered** folder:
 12-faker/
 13-zensical/
 14-complexipy/
+15-heapq/
+16-graphlib/
 ```
 
 Inside every folder you will find:
@@ -64,6 +66,8 @@ Inside every folder you will find:
 12. `faker` — generate realistic fake data
 13. `zensical` — static site generator from the Material for MkDocs team
 14. `complexipy` — cognitive complexity analysis for Python code
+15. `heapq` — heap queue / priority queue (standard library)
+16. `graphlib` — topological sorting of directed graphs (standard library)
 
 ## Conventions
 
