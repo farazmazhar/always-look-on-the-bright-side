@@ -18,6 +18,9 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+.mypy_cache
+build
+dist
 
 # Go
 *.exe
@@ -36,6 +39,5 @@ target/
 .env
 .env.*
 
-.mypy_cache
-build
-dist
+# Playwright
+.playwright-mcp
