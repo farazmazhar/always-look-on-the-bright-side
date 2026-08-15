@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grok 4.5</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: #141416;
+      --surface-2: #1c1c1f;
+      --border: #2a2a2e;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --accent: #f97316;
+      --accent-dim: rgba(249, 115, 22, 0.15);
+      --accent-hover: #fb923c;
+      --user-bg: #1a2332;
+      --ai-bg: #141416;
+      --green: #22c55e;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 280px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .brand {
+      padding: 20px 18px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(249, 115, 22, 0.35);
+    }
+
+    .brand-text h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-text p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .new-chat {
+      margin: 14px 12px;
+      padding: 11px 14px;
+      border-radius: 10px;
+      border: 1px dashed var(--border);
+      background: transparent;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+
+    .new-chat:hover {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .history {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 10px 12px;
+    }
+
+    .history-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding: 12px 8px 6px;
+      opacity: 0.8;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .history-item:hover { background: var(--surface-2); color: var(--text); }
+    .history-item.active {
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .history-item span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar-foot {
+      padding: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .user-meta { flex: 1; min-width: 0; }
+    .user-meta .name { font-size: 13px; font-weight: 600; }
+    .user-meta .plan { font-size: 11px; color: var(--muted); }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg);
+    }
+
+    .topbar {
+      height: 56px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: var(--surface);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .topbar-left h2 {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--accent-dim);
+      color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    .top-actions { display: flex; gap: 6px; }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.12s;
+    }
+
+    .icon-btn:hover { background: var(--surface-2); color: var(--text); }
+    .icon-btn svg { width: 17px; height: 17px; }
+
+    .thread {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .msg {
+      display: flex;
+      gap: 14px;
+      max-width: 820px;
+      width: 100%;
+      margin: 0 auto;
+      animation: rise 0.28s ease;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .msg.user { flex-direction: row-reverse; }
+
+    .msg-av {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .msg-av.grok {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: #fff;
+    }
+
+    .msg-av.human {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: #fff;
+    }
+
+    .msg-body { flex: 1; min-width: 0; }
+    .msg.user .msg-body { text-align: right; }
+
+    .msg-who {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .bubble {
+      display: inline-block;
+      text-align: left;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 100%;
+    }
+
+    .msg.ai .bubble {
+      background: var(--ai-bg);
+      border: 1px solid var(--border);
+      border-top-left-radius: 4px;
+    }
+
+    .msg.user .bubble {
+      background: var(--user-bg);
+      border: 1px solid #243044;
+      border-top-right-radius: 4px;
+    }
+
+    .bubble strong { color: var(--accent); font-weight: 600; }
+
+    .bullet {
+      padding: 2px 0 2px 14px;
+      position: relative;
+    }
+
+    .bullet::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 11px;
+      top: 4px;
+    }
+
+    .code-wrap {
+      margin: 12px 0;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0d0d0f;
+    }
+
+    .code-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 14px;
+      background: #18181b;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .code-bar button {
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .code-bar button:hover { color: var(--text); border-color: var(--muted); }
+
+    pre {
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #e4e4e7;
+    }
+
+    .reason {
+      margin: 0 0 12px;
+      padding: 10px 14px;
+      border-left: 2px solid var(--accent);
+      background: var(--accent-dim);
+      border-radius: 0 10px 10px 0;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .reason-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .msg-tools {
+      display: flex;
+      gap: 4px;
+      margin-top: 8px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .msg:hover .msg-tools { opacity: 1; }
+    .msg.user .msg-tools { justify-content: flex-end; }
+
+    .tool {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tool:hover { background: var(--surface-2); color: var(--text); }
+    .tool svg { width: 13px; height: 13px; }
+
+    .composer {
+      padding: 16px 24px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .composer-inner {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 10px 12px;
+      transition: border-color 0.15s;
+    }
+
+    .composer-inner:focus-within { border-color: var(--accent); }
+
+    .composer-inner textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 14px;
+      resize: none;
+      max-height: 140px;
+      line-height: 1.5;
+      padding: 6px 4px;
+    }
+
+    .composer-inner textarea::placeholder { color: var(--muted); }
+
+    .send {
+      width: 38px;
+      height: 38px;
+      border: none;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #fff;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .send:hover { background: var(--accent-hover); transform: scale(1.04); }
+    .send svg { width: 18px; height: 18px; }
+
+    .attach {
+      width: 34px;
+      height: 34px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .attach:hover { color: var(--text); background: var(--surface-2); }
+    .attach svg { width: 18px; height: 18px; }
+
+    .disclaimer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.65;
+      margin-top: 10px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .stats span { display: inline-flex; align-items: center; gap: 4px; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">G</div>
+      <div class="brand-text">
+        <h1>Grok 4.5</h1>
+        <p>Maximum truth-seeking</p>
+      </div>
+    </div>
+
+    <button class="new-chat">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+      New conversation
+    </button>
+
+    <div class="history">
+      <div class="history-label">Today</div>
+      <div class="history-item active">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>Rust async runtime design</span>
+      </div>
+      <div class="history-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>Market microstructure basics</span>
+      </div>
+      <div class="history-label">Yesterday</div>
+      <div class="history-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>Kubernetes networking deep dive</span>
+      </div>
+      <div class="history-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span>Write a satirical product launch</span>
+      </div>
+      <div class="history-label">Earlier</div>
+      <div class="history-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <span> grepping huge logs efficiently</span>
+      </div>
+    </div>
+
+    <div class="sidebar-foot">
+      <div class="avatar">F</div>
+      <div class="user-meta">
+        <div class="name">Faraz</div>
+        <div class="plan">SuperGrok</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h2>Grok 4.5</h2>
+        <span class="pill">LIVE</span>
+        <div class="status"><span class="status-dot"></span> Online</div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" title="Search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+        </button>
+        <button class="icon-btn" title="Share">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+        </button>
+        <button class="icon-btn" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="thread">
+      <div class="msg user">
+        <div class="msg-av human">F</div>
+        <div class="msg-body">
+          <div class="msg-who">You</div>
+          <div class="bubble">
+            Explain how Tokio's work-stealing scheduler works, and sketch a minimal multi-threaded executor in Rust.
+          </div>
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="msg-av grok">G</div>
+        <div class="msg-body">
+          <div class="msg-who">Grok 4.5</div>
+          <div class="bubble">
+            <div class="reason">
+              <div class="reason-label">Reasoning</div>
+              Cover work-stealing queues, LIFO local / FIFO steal, cooperative yielding, then a toy executor with channels + park/unpark — keep it honest about what's simplified vs production Tokio.
+            </div>
+            <p><strong>Tokio's scheduler</strong> is a multi-threaded, work-stealing runtime. Rough mental model:</p>
+            <div class="bullet">Each worker thread owns a <strong>local run queue</strong> (usually LIFO for cache locality).</div>
+            <div class="bullet">When idle, a worker <strong>steals</strong> tasks from other workers' queues (FIFO half) or the global injector.</div>
+            <div class="bullet">Tasks are cooperative: they yield at <code>.await</code> points; no preemption of pure CPU loops.</div>
+            <div class="bullet">I/O and timers live on separate drivers; readiness wakes tasks back onto queues.</div>
+            <br>
+            <p>Here's a <strong>minimal multi-threaded executor</strong> (toy — not production-safe):</p>
+            <div class="code-wrap">
+              <div class="code-bar">
+                <span>rust</span>
+                <button>Copy</button>
+              </div>
+              <pre>use std::collections::VecDeque;
+use std::sync::{Arc, Mutex, Condvar};
+use std::thread;
+
+type Job = Box&lt;dyn FnOnce() + Send + 'static&gt;;
+
+struct Executor {
+    queue: Mutex&lt;VecDeque&lt;Job&gt;&gt;,
+    cv: Condvar,
+    shutdown: Mutex&lt;bool&gt;,
+}
+
+impl Executor {
+    fn new(workers: usize) -&gt; Arc&lt;Self&gt; {
+        let ex = Arc::new(Self {
+            queue: Mutex::new(VecDeque::new()),
+            cv: Condvar::new(),
+            shutdown: Mutex::new(false),
+        });
+        for _ in 0..workers {
+            let ex = Arc::clone(&amp;ex);
+            thread::spawn(move || loop {
+                let job = {
+                    let mut q = ex.queue.lock().unwrap();
+                    while q.is_empty() && !*ex.shutdown.lock().unwrap() {
+                        q = ex.cv.wait(q).unwrap();
+                    }
+                    if q.is_empty() { break; }
+                    q.pop_front()
+                };
+                if let Some(job) = job { job(); }
+            });
+        }
+        ex
+    }
+
+    fn spawn&lt;F: FnOnce() + Send + 'static&gt;(&amp;self, f: F) {
+        self.queue.lock().unwrap().push_back(Box::new(f));
+        self.cv.notify_one();
+    }
+}</pre>
+            </div>
+            <p>Real Tokio adds: per-core queues, stealing, cooperative budget, I/O driver, and <code>Waker</code> integration with <code>Future</code>. Want the steal half next, or how <code>Waker</code> hooks into this?</p>
+            <div class="stats">
+              <span>⚡ 1.2s</span>
+              <span>◈ 842 tokens</span>
+            </div>
+          </div>
+          <div class="msg-tools">
+            <button class="tool">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy
+            </button>
+            <button class="tool">Regenerate</button>
+            <button class="tool">Share</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg user">
+        <div class="msg-av human">F</div>
+        <div class="msg-body">
+          <div class="msg-who">You</div>
+          <div class="bubble">Show the steal side — how a worker pulls work from another queue.</div>
+        </div>
+      </div>
+
+      <div class="msg ai">
+        <div class="msg-av grok">G</div>
+        <div class="msg-body">
+          <div class="msg-who">Grok 4.5</div>
+          <div class="bubble">
+            <div class="reason">
+              <div class="reason-label">Reasoning</div>
+              Sketch steal from the opposite end of a deque; mention contention and half-steal heuristics without overclaiming Tokio internals.
+            </div>
+            <p>Classic pattern: local push/pop on one end, steal from the other.</p>
+            <div class="code-wrap">
+              <div class="code-bar">
+                <span>rust</span>
+                <button>Copy</button>
+              </div>
+              <pre>struct WorkerQueue {
+    // conceptually: local LIFO end + steal FIFO end
+    deque: Mutex&lt;VecDeque&lt;Job&gt;&gt;,
+}
+
+impl WorkerQueue {
+    fn push_local(&amp;self, job: Job) {
+        self.deque.lock().unwrap().push_back(job); // LIFO with pop_back
+    }
+
+    fn pop_local(&amp;self) -&gt; Option&lt;Job&gt; {
+        self.deque.lock().unwrap().pop_back()
+    }
+
+    /// Other workers call this
+    fn steal(&amp;self) -&gt; Option&lt;Job&gt; {
+        let mut q = self.deque.lock().unwrap();
+        // steal from the opposite end (FIFO)
+        q.pop_front()
+    }
+
+    fn steal_half(&amp;self) -&gt; Vec&lt;Job&gt; {
+        let mut q = self.deque.lock().unwrap();
+        let n = (q.len() + 1) / 2;
+        q.drain(..n).collect()
+    }
+}</pre>
+            </div>
+            <div class="bullet"><strong>Local LIFO</strong> — hot tasks stay cache-warm.</div>
+            <div class="bullet"><strong>Steal FIFO / half</strong> — older work spreads out; reduces thundering herd on one victim.</div>
+            <div class="bullet"><strong>Lock-free deques</strong> (Chase-Lev style) are what production runtimes actually use.</div>
+            <br>
+            <p>Next level up: wire this into <code>RawWaker</code> so <code>.await</code> can re-queue the future. Say the word.</p>
+            <div class="stats">
+              <span>⚡ 0.9s</span>
+              <span>◈ 512 tokens</span>
+            </div>
+          </div>
+          <div class="msg-tools">
+            <button class="tool">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy
+            </button>
+            <button class="tool">Regenerate</button>
+            <button class="tool">Share</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="composer">
+      <div class="composer-inner">
+        <button class="attach" title="Attach">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <textarea rows="1" placeholder="Message Grok 4.5..."></textarea>
+        <button class="send" title="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </div>
+      <div class="disclaimer">Grok 4.5 can be wrong. Verify anything that matters.</div>
+    </div>
+  </main>
+</body>
+</html>

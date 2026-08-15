@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GPT-5.6 Luna | Signal Workspace</title>
+  <style>
+    :root {
+      --bg: #11101b;
+      --panel: #191827;
+      --panel-2: #222137;
+      --line: #302e49;
+      --text: #f6f3ff;
+      --muted: #a6a1bd;
+      --violet: #a78bfa;
+      --pink: #f472b6;
+      --mint: #6ee7c1;
+      --amber: #fbbf68;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .28);
+    }
+    [data-theme="light"] {
+      --bg: #f5f2fb;
+      --panel: #fff;
+      --panel-2: #eeeafb;
+      --line: #dfd9ef;
+      --text: #241f38;
+      --muted: #736b89;
+      --shadow: 0 18px 50px rgba(67, 47, 108, .12);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, sans-serif; min-height: 100vh; transition: .25s; }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .app { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
+    .sidebar { padding: 24px 16px; border-right: 1px solid var(--line); background: var(--panel); display: flex; flex-direction: column; gap: 8px; }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 10px 30px; font-weight: 750; letter-spacing: -.02em; }
+    .mark { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 12px; color: #211733; background: linear-gradient(135deg, var(--mint), var(--violet) 55%, var(--pink)); font-weight: 900; }
+    .eyebrow { color: var(--muted); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; padding: 12px 10px 5px; }
+    .nav { border: 0; background: transparent; color: var(--muted); text-align: left; padding: 11px 12px; border-radius: 10px; display: flex; gap: 11px; align-items: center; font-size: 13px; }
+    .nav:hover, .nav.active { color: var(--text); background: var(--panel-2); }
+    .nav.active { box-shadow: inset 3px 0 var(--violet); }
+    .nav span { width: 18px; text-align: center; }
+    .sidebar-bottom { margin-top: auto; border-top: 1px solid var(--line); padding: 15px 10px 0; display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--pink), var(--violet)); color: #fff; font-size: 12px; font-weight: 800; }
+    .sidebar-bottom small { color: var(--muted); display: block; margin-top: 2px; }
+    .content { min-width: 0; padding: 26px clamp(18px, 4vw, 54px); max-width: 1500px; width: 100%; margin: auto; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 44px; }
+    .crumb { color: var(--muted); font-size: 13px; }
+    .crumb strong { color: var(--text); }
+    .actions { display: flex; gap: 9px; }
+    .ghost, .primary { border: 1px solid var(--line); border-radius: 10px; padding: 9px 13px; color: var(--text); background: var(--panel); font-size: 12px; }
+    .ghost:hover { border-color: var(--violet); }
+    .primary { border: 0; color: #211733; font-weight: 750; background: linear-gradient(110deg, var(--mint), var(--violet)); }
+    .hero { display: flex; justify-content: space-between; gap: 30px; align-items: end; margin-bottom: 32px; }
+    h1 { font-size: clamp(32px, 5vw, 64px); line-height: .98; letter-spacing: -.065em; max-width: 720px; margin: 0 0 17px; }
+    h1 em { color: var(--violet); font-style: normal; }
+    .subtitle { max-width: 550px; color: var(--muted); font-size: 15px; line-height: 1.65; margin: 0; }
+    .pulse { min-width: 180px; border: 1px solid var(--line); background: var(--panel); padding: 14px; border-radius: 14px; box-shadow: var(--shadow); }
+    .pulse-label { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; }
+    .pulse strong { display: block; font-size: 24px; margin: 4px 0 9px; }
+    .meter { height: 5px; background: var(--panel-2); border-radius: 9px; overflow: hidden; }
+    .meter i { display: block; width: 72%; height: 100%; background: linear-gradient(90deg, var(--mint), var(--violet)); border-radius: inherit; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .75fr); gap: 18px; }
+    .card { background: var(--panel); border: 1px solid var(--line); border-radius: 17px; padding: 20px; box-shadow: var(--shadow); }
+    .card-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 18px; }
+    h2 { font-size: 15px; margin: 0; letter-spacing: -.01em; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 11px; }
+    .column { background: var(--bg); border-radius: 12px; padding: 11px; min-height: 270px; }
+    .column-head { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; }
+    .count { background: var(--panel-2); padding: 3px 7px; border-radius: 8px; }
+    .task { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-bottom: 8px; transition: transform .15s, border-color .15s; }
+    .task:hover { transform: translateY(-2px); border-color: var(--violet); }
+    .task-title { font-size: 13px; font-weight: 650; line-height: 1.4; }
+    .task-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; color: var(--muted); font-size: 11px; }
+    .tag { padding: 3px 7px; border-radius: 99px; background: rgba(167, 139, 250, .14); color: var(--violet); }
+    .tag.mint { color: var(--mint); background: rgba(110, 231, 193, .12); }
+    .tag.amber { color: var(--amber); background: rgba(251, 191, 104, .12); }
+    .dropzone { color: var(--muted); border: 1px dashed var(--line); border-radius: 9px; text-align: center; padding: 10px 5px; font-size: 11px; margin-top: 10px; }
+    .dropzone:hover { border-color: var(--violet); color: var(--text); }
+    .insight { display: flex; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+    .insight:last-child { border-bottom: 0; }
+    .insight-icon { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; background: var(--panel-2); flex-shrink: 0; }
+    .insight strong { font-size: 12px; display: block; margin-bottom: 4px; }
+    .insight p { color: var(--muted); font-size: 12px; line-height: 1.45; margin: 0; }
+    .quick-input { display: flex; gap: 8px; margin-top: 16px; }
+    .quick-input input { min-width: 0; flex: 1; border: 1px solid var(--line); border-radius: 9px; padding: 10px; color: var(--text); background: var(--bg); outline: 0; font-size: 12px; }
+    .quick-input input:focus { border-color: var(--violet); }
+    .empty { color: var(--muted); font-size: 11px; text-align: center; padding: 40px 5px; }
+    .toast-wrap { position: fixed; right: 20px; bottom: 20px; z-index: 20; display: grid; gap: 8px; }
+    .toast { background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--mint); border-radius: 9px; padding: 11px 14px; font-size: 12px; box-shadow: var(--shadow); animation: toast .2s ease; }
+    @keyframes toast { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+    .mobile-menu { display: none; }
+    @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .hero { align-items: start; } .pulse { display: none; } }
+    @media (max-width: 700px) { .sidebar { position: fixed; inset: 0 auto 0 0; width: 248px; z-index: 10; transform: translateX(-105%); transition: transform .2s; box-shadow: var(--shadow); } .sidebar.open { transform: none; } .mobile-menu { display: inline-grid; place-items: center; margin-right: 9px; } .topbar { margin-bottom: 30px; } .hero { display: block; } .board { grid-template-columns: 1fr; } .column { min-height: auto; } .content { padding: 18px; } }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><div class="mark">✦</div><span>Luna Studio</span></div>
+      <div class="eyebrow">Workspace</div>
+      <button class="nav active" data-view="overview"><span>◈</span>Overview</button>
+      <button class="nav" data-view="roadmap"><span>◇</span>Roadmap</button>
+      <button class="nav" data-view="notes"><span>▤</span>Notes</button>
+      <div class="eyebrow">Collections</div>
+      <button class="nav" data-view="ideas"><span>✧</span>Idea garden <small style="margin-left:auto">12</small></button>
+      <button class="nav" data-view="archive"><span>□</span>Archive</button>
+      <div class="sidebar-bottom"><div class="avatar">FL</div><div><b style="font-size:12px">Faraz Luna</b><small>Personal workspace</small></div></div>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div class="crumb"><button class="ghost mobile-menu" id="menuBtn">☰</button><strong>My workspace</strong> / Signal</div>
+        <div class="actions"><button class="ghost" id="themeBtn">☾ Theme</button><button class="primary" id="newIdeaBtn">＋ New idea</button></div>
+      </header>
+
+      <section id="overview" class="view">
+        <div class="hero">
+          <div><h1>Make room for<br><em>good signals.</em></h1><p class="subtitle">A calm place to turn loose thoughts into deliberate work. Keep the interesting parts, let the noise drift away.</p></div>
+          <div class="pulse"><div class="pulse-label"><span>Focus pulse</span><span>Today</span></div><strong>72%</strong><div class="meter"><i></i></div></div>
+        </div>
+        <div class="layout">
+          <section class="card">
+            <div class="card-head"><div><h2>Current orbit</h2><span class="muted">Drag a thought into motion</span></div><button class="ghost" id="clearBtn">Clear done</button></div>
+            <div class="board">
+              <div class="column" data-column="spark"><div class="column-head"><span>Sparks</span><span class="count">3</span></div><div class="task" draggable="true"><div class="task-title">A reading list that remembers why I saved it</div><div class="task-meta"><span class="tag">research</span><span>just now</span></div></div><div class="task" draggable="true"><div class="task-title">Tiny rituals for better code reviews</div><div class="task-meta"><span class="tag mint">writing</span><span>yesterday</span></div></div><div class="task" draggable="true"><div class="task-title">What if settings felt like a conversation?</div><div class="task-meta"><span class="tag amber">product</span><span>2d ago</span></div></div><div class="dropzone">+ drop a spark here</div></div>
+              <div class="column" data-column="focus"><div class="column-head"><span>In focus</span><span class="count">2</span></div><div class="task" draggable="true"><div class="task-title">Shape the first-run experience</div><div class="task-meta"><span class="tag mint">active</span><span>4 notes</span></div></div><div class="task" draggable="true"><div class="task-title">Collect examples of quiet interfaces</div><div class="task-meta"><span class="tag">curate</span><span>7 links</span></div></div><div class="dropzone">+ move something here</div></div>
+              <div class="column" data-column="done"><div class="column-head"><span>At rest</span><span class="count">2</span></div><div class="task" draggable="true"><div class="task-title">Choose a warmer palette</div><div class="task-meta"><span class="tag mint">complete</span><span>today</span></div></div><div class="task" draggable="true"><div class="task-title">Name the workspace</div><div class="task-meta"><span class="tag mint">complete</span><span>today</span></div></div><div class="dropzone">+ archive a thought</div></div>
+            </div>
+          </section>
+          <aside class="card">
+            <div class="card-head"><div><h2>Small signals</h2><span class="muted">A gentle nudge</span></div><span style="color:var(--mint)">●</span></div>
+            <div class="insight"><div class="insight-icon">◷</div><div><strong>You have 25 quiet minutes</strong><p>Enough time to outline the idea about conversational settings.</p></div></div>
+            <div class="insight"><div class="insight-icon">↗</div><div><strong>Two ideas are orbiting each other</strong><p>“Reading list” and “quiet interfaces” share a common thread.</p></div></div>
+            <div class="insight"><div class="insight-icon">✦</div><div><strong>Your best focus window is near</strong><p>Historically, you do your clearest work between now and 11:30.</p></div></div>
+            <div class="quick-input"><input id="signalInput" placeholder="Capture a quick thought…"><button class="primary" id="captureBtn">Capture</button></div>
+          </aside>
+        </div>
+      </section>
+      <section id="roadmap" class="view" hidden><div class="hero"><div><h1>A softer<br><em>roadmap.</em></h1><p class="subtitle">Give your future work enough shape to become real, without squeezing the life out of it.</p></div></div><div class="card"><div class="card-head"><h2>Next horizons</h2><button class="primary" id="addHorizon">＋ Add horizon</button></div><div id="horizonList"></div></div></section>
+      <section id="notes" class="view" hidden><div class="hero"><div><h1>Notes that<br><em>breathe.</em></h1><p class="subtitle">A simple canvas for fragments, observations and the things not ready to become tasks.</p></div></div><div class="card"><textarea id="notesArea" placeholder="Start writing here…" style="width:100%;min-height:300px;resize:vertical;background:transparent;border:0;outline:0;color:var(--text);font:inherit;line-height:1.8;font-size:15px;"></textarea></div></section>
+      <section id="ideas" class="view" hidden><div class="hero"><div><h1>Let ideas<br><em>wander.</em></h1><p class="subtitle">Not every thought needs a deadline. Keep the promising ones close.</p></div></div><div class="card"><div class="card-head"><h2>Idea garden</h2><span class="muted">12 growing ideas</span></div><div id="ideaList"></div></div></section>
+      <section id="archive" class="view" hidden><div class="hero"><div><h1>What has<br><em>settled.</em></h1><p class="subtitle">Finished work is still part of the signal. Revisit it when you need a little proof.</p></div></div><div class="card"><div class="empty">Nothing archived in this prototype yet.</div></div></section>
+    </main>
+  </div>
+  <div class="toast-wrap" id="toasts"></div>
+  <script>
+    const toast = (message) => { const item = document.createElement('div'); item.className = 'toast'; item.textContent = message; document.getElementById('toasts').appendChild(item); setTimeout(() => item.remove(), 2600); };
+    const views = document.querySelectorAll('.view');
+    document.querySelectorAll('.nav').forEach(button => button.addEventListener('click', () => { document.querySelectorAll('.nav').forEach(n => n.classList.remove('active')); button.classList.add('active'); views.forEach(v => v.hidden = v.id !== button.dataset.view); document.getElementById('sidebar').classList.remove('open'); }));
+    document.getElementById('menuBtn').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+    document.getElementById('themeBtn').addEventListener('click', () => { const root = document.documentElement; root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark'; toast('Theme changed'); });
+    document.getElementById('newIdeaBtn').addEventListener('click', () => { document.getElementById('signalInput').focus(); toast('Ready for a new idea'); });
+    document.getElementById('captureBtn').addEventListener('click', () => { const input = document.getElementById('signalInput'); if (!input.value.trim()) { toast('Write a thought first'); return; } const task = document.createElement('div'); task.className = 'task'; task.draggable = true; task.innerHTML = `<div class="task-title"></div><div class="task-meta"><span class="tag">new</span><span>just now</span></div>`; task.querySelector('.task-title').textContent = input.value.trim(); document.querySelector('[data-column="spark"]').insertBefore(task, document.querySelector('[data-column="spark"] .dropzone')); input.value = ''; toast('Thought captured in Sparks'); });
+    document.getElementById('clearBtn').addEventListener('click', () => { document.querySelectorAll('[data-column="done"] .task').forEach(t => t.remove()); toast('Resting ideas cleared'); });
+    document.getElementById('addHorizon').addEventListener('click', () => { const name = prompt('Name this horizon'); if (!name) return; const row = document.createElement('div'); row.className = 'insight'; row.innerHTML = `<div class="insight-icon">◎</div><div><strong></strong><p>New horizon, ready to take shape.</p></div>`; row.querySelector('strong').textContent = name; document.getElementById('horizonList').appendChild(row); toast('Horizon added'); });
+    const ideas = ['A personal changelog for decisions', 'Tools that reward stopping', 'The emotional ergonomics of forms', 'A tiny library of useful defaults'];
+    document.getElementById('ideaList').innerHTML = ideas.map((idea, i) => `<div class="insight"><div class="insight-icon">${['✧','◌','◇','✦'][i]}</div><div><strong>${idea}</strong><p>${['Saved from a conversation · 3 days ago','A note about attention · 1 week ago','Still has a little electricity · 2 weeks ago','Worth returning to · last month'][i]}</p></div></div>`).join('');
+    let dragged;
+    document.addEventListener('dragstart', event => { if (event.target.classList.contains('task')) dragged = event.target; });
+    document.querySelectorAll('.column').forEach(column => column.addEventListener('dragover', event => event.preventDefault()));
+    document.querySelectorAll('.column').forEach(column => column.addEventListener('drop', event => { event.preventDefault(); if (!dragged) return; column.insertBefore(dragged, column.querySelector('.dropzone')); toast('Idea moved'); dragged = null; }));
+  </script>
+</body>
+</html>
