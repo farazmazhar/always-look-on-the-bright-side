@@ -41,3 +41,6 @@ target/
 
 # Playwright
 .playwright-mcp
+
+# CommandCode
+.commandcode/
