@@ -19,25 +19,25 @@ tags: [azure, certification, az-900, index]
 
 | # | Domain | Weight | Document |
 |:--|:--|:--|:--|
-| 1 | Cloud Concepts | 25-30% | [[az-900-01-cloud-concepts]] |
-| 2 | Azure Architecture | — | [[az-900-02-architecture]] |
-| 3 | Compute Services | — | [[az-900-03-compute]] |
-| 4 | Networking | — | [[az-900-04-networking]] |
-| 5 | Storage | — | [[az-900-05-storage]] |
-| 6 | Identity & Security | — | [[az-900-06-identity-security]] |
-| 7 | Management & Governance | 30-35% | [[az-900-07-management-governance]] |
+| 1 | Cloud Concepts | 25-30% | [az-900-01-cloud-concepts](az-900-01-cloud-concepts.md) |
+| 2 | Azure Architecture | — | [az-900-02-architecture](az-900-02-architecture.md) |
+| 3 | Compute Services | — | [az-900-03-compute](az-900-03-compute.md) |
+| 4 | Networking | — | [az-900-04-networking](az-900-04-networking.md) |
+| 5 | Storage | — | [az-900-05-storage](az-900-05-storage.md) |
+| 6 | Identity & Security | — | [az-900-06-identity-security](az-900-06-identity-security.md) |
+| 7 | Management & Governance | 30-35% | [az-900-07-management-governance](az-900-07-management-governance.md) |
 
 > Domains 2-6 together make up "Azure Architecture and Services" (35-40% combined).
 
 ## Study Order (Recommended)
 
-1. [[az-900-01-cloud-concepts]] — Foundations. Shortest. Start here.
-2. [[az-900-02-architecture]] — Regions, hierarchy. Quick read, frequently tested.
-3. [[az-900-03-compute]] — VMs, containers, functions, app hosting decisions.
-4. [[az-900-04-networking]] — VNets, VPN vs ExpressRoute, load balancing, NSGs.
-5. [[az-900-05-storage]] — Blob, Files, redundancy, access tiers, migration.
-6. [[az-900-06-identity-security]] — Entra ID, RBAC, Zero Trust, Defender.
-7. [[az-900-07-management-governance]] — Policy, cost, monitoring, deployment tools. Most content-dense — save for last.
+1. [az-900-01-cloud-concepts](az-900-01-cloud-concepts.md) — Foundations. Shortest. Start here.
+2. [az-900-02-architecture](az-900-02-architecture.md) — Regions, hierarchy. Quick read, frequently tested.
+3. [az-900-03-compute](az-900-03-compute.md) — VMs, containers, functions, app hosting decisions.
+4. [az-900-04-networking](az-900-04-networking.md) — VNets, VPN vs ExpressRoute, load balancing, NSGs.
+5. [az-900-05-storage](az-900-05-storage.md) — Blob, Files, redundancy, access tiers, migration.
+6. [az-900-06-identity-security](az-900-06-identity-security.md) — Entra ID, RBAC, Zero Trust, Defender.
+7. [az-900-07-management-governance](az-900-07-management-governance.md) — Policy, cost, monitoring, deployment tools. Most content-dense — save for last.
 
 ## High-Yield Distinctions (Print This Page)
 
