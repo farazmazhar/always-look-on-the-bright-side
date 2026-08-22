@@ -93,8 +93,8 @@ class Account(BaseModel):
 
 acct = Account(
     username="carol",
-    role="admin",
-    address={"street": "1 Main St", "city": "Springfield", "zip_code": "12345"},
+    role="admin",  # type: ignore[arg-type]
+    address={"street": "1 Main St", "city": "Springfield", "zip_code": "12345"},  # type: ignore[arg-type]
 )
 print("\n4. Nested models:", acct)
 print("   acct.role is a Role enum:", acct.role, type(acct.role).__name__)
