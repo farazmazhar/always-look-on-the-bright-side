@@ -41,6 +41,9 @@ Each library gets its own **numbered** folder:
 14-complexipy/
 15-heapq/
 16-graphlib/
+17-fastapi-streaming/
+18-django/
+19-django-rest-framework/
 ```
 
 Inside every folder you will find:
@@ -68,6 +71,9 @@ Inside every folder you will find:
 14. `complexipy` — cognitive complexity analysis for Python code
 15. `heapq` — heap queue / priority queue (standard library)
 16. `graphlib` — topological sorting of directed graphs (standard library)
+17. `fastapi-streaming` — SSE streaming for LLM chat APIs with FastAPI
+18. `django` — the batteries-included web framework (ORM, forms, admin, auth)
+19. `django-rest-framework` — JSON APIs on Django (serializers, ViewSets, routers)
 
 ## Conventions
 
