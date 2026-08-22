@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>FastAPI LLM streaming demo</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+  .box { border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+  #log { white-space: pre-wrap; min-height: 4rem; background: #f6f6f6; border-radius: 4px; padding: .5rem; }
+  .error { color: #b00020; }
+</style>
+</head>
+<body>
+  <h1>FastAPI LLM streaming</h1>
+  <p>POST <code>/v1/chat</code>, read the SSE stream, render tokens as they arrive.</p>
+
+  <div class="box">
+    <label for="prompt">Prompt</label>
+    <input id="prompt" type="text" value="tell me a haiku" style="width: 60%" />
+    <button id="send">Send</button>
+  </div>
+
+  <div class="box">
+    <h3>Assistant</h3>
+    <div id="log">—</div>
+  </div>
+
+  <script>
+    // ------------------------------------------------------------------
+    // The note's "gotcha" made visible: EventSource only supports GET and
+    // can't send a body or headers — useless for a POST chat endpoint.
+    // So we use fetch + ReadableStream, and parse the SSE ourselves.
+    // ------------------------------------------------------------------
+
+    const input = document.getElementById("prompt");
+    const log = document.getElementById("log");
+    const button = document.getElementById("send");
+
+    async function send() {
+      button.disabled = true;
+      log.textContent = "";
+      log.classList.remove("error");
+
+      try {
+        // --- fire the POST and get a ReadableStream body back ---
+        const res = await fetch("/v1/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: input.value }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+
+        // --- the chunk-boundary gotcha ---
+        // TCP/HTTP chunks do NOT respect SSE event boundaries: one network
+        // chunk may hold several events, or half of one. Keep a buffer and
+        // split on newlines, holding back the last (possibly partial) line.
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          const lines = buffer.split("\n");
+          buffer = lines.pop(); // partial line -> keep for next chunk
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const { token } = JSON.parse(line.slice(6));
+              log.textContent += token;
+            }
+            // comment lines (": keepalive") and event: lines are ignored
+          }
+        }
+        // flush any trailing partial line on stream end
+        if (buffer.startsWith("data: ")) {
+          const { token } = JSON.parse(buffer.slice(6));
+          log.textContent += token;
+        }
+      } catch (err) {
+        log.textContent = `Error: ${err.message}`;
+        log.classList.add("error");
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    button.addEventListener("click", send);
+    input.addEventListener("keydown", (e) => { if (e.key === "Enter") send(); });
+  </script>
+</body>
+</html>
